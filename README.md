@@ -13,3 +13,6 @@ Status: in development
   identifier quoting needed in generated SQL.
 - App connects as `chinook_readonly`, a SELECT-only role with a 10s
   statement timeout.
+- Invoice dates span 2021-01-01 to 2025-12-22 (not the classic 2009-2013
+  Chinook range). Eval questions must use years inside this window.
+- All 3503 tracks have a genre_id, so track-genre joins drop no rows.
