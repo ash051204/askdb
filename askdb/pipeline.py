@@ -59,3 +59,62 @@ def validate_sql(sql: str) -> str:
         raise UnsafeSQLError(f"Only SELECT queries are allowed, got {first_word}.")
 
     return statement
+
+
+RETRY_TEMPLATE = """You are a PostgreSQL expert. Your previous query failed.
+
+Database schema:
+{schema}
+
+Question: {question}
+
+Your previous SQL:
+{failed_sql}
+
+The database returned this error:
+{error}
+
+Write a corrected SQL query. Return ONLY the SQL, no explanation.
+
+SQL:"""
+
+
+def answer(question: str, log=None):
+    """Question -> SQL -> result, with one retry on failure.
+
+    Returns (sql, columns, rows, error). Error is None on success.
+    """
+    from askdb.db import run_query
+    from askdb.llm import generate
+
+    attempts = []
+
+    sql = extract_sql(generate(build_prompt(question)))
+    try:
+        sql = validate_sql(sql)
+    except UnsafeSQLError as e:
+        return sql, None, None, str(e)
+
+    columns, rows, error = run_query(sql)
+    attempts.append({"sql": sql, "error": error})
+
+    if error is not None:
+        retry_prompt = RETRY_TEMPLATE.format(
+            schema=get_schema(),
+            question=question,
+            failed_sql=sql,
+            error=error,
+        )
+        sql = extract_sql(generate(retry_prompt))
+        try:
+            sql = validate_sql(sql)
+        except UnsafeSQLError as e:
+            return sql, None, None, str(e)
+
+        columns, rows, error = run_query(sql)
+        attempts.append({"sql": sql, "error": error})
+
+    if log is not None:
+        log.extend(attempts)
+
+    return sql, columns, rows, error
