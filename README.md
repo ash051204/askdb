@@ -19,3 +19,6 @@ Status: in development
 - Foreign keys are read from `pg_catalog`, not `information_schema`. The
   latter filters by privilege and returns nothing for the read-only app
   role, which silently produced a schema with no relationships.
+- `validate_sql` splits on `;` naively, so a semicolon inside a string
+  literal would be rejected. This is a false negative, never a false
+  positive — the read-only role is the actual security guarantee.
