@@ -32,3 +32,21 @@ Status: in development
   `order_matters` flag in the Phase 4 comparison function.
 - pgvector's Homebrew bottle only ships extensions for PG17/PG18, so it was
   built from source (v0.8.0) against postgresql@16's pg_config.
+
+## Retrieval quality (Phase 3)
+
+Similarity scores cluster in a narrow band (0.43-0.78) against a ~0.47 baseline
+for unrelated text, so ranking is weakly discriminative.
+
+On "which artists sold the most tracks", the `artist` table ranks 7th of 11 —
+k must reach 64% of the schema to retrieve a table the question names outright.
+Longer descriptions (album, track) outrank shorter ones (artist) regardless of
+relevance.
+
+Root cause: embedding similarity matches on topic, while SQL generation needs
+join reachability. A question requiring a 4-table join chain cannot be served
+by top-k semantic retrieval unless k approaches full schema size.
+
+Sharpening the `playlist` description moved it from rank 1 to rank 6 on the
+artist question — wording measurably changes retrieval, but does not fix the
+structural limitation.

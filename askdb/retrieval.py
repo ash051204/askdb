@@ -53,9 +53,9 @@ TABLE_DESCRIPTIONS = {
         "encoding types."
     ),
     "playlist": (
-        "Named collections of tracks curated in the store, such as Classical or "
-        "Heavy Metal playlists. Contains only the playlist name. Not related to "
-        "sales or customers. Use for questions about playlists."
+        "User-created playlists. Contains only a playlist name. Playlists are "
+        "not sold and have no price, revenue, artist or genre information. Use "
+        "only for questions that explicitly mention playlists."
     ),
     "playlist_track": (
         "A junction table linking playlists to the tracks they contain. Holds "
@@ -71,3 +71,73 @@ TABLE_DESCRIPTIONS = {
         "prices."
     ),
 }
+
+
+import os
+
+import psycopg2
+from dotenv import load_dotenv
+from sentence_transformers import SentenceTransformer
+
+load_dotenv()
+
+MODEL_NAME = "BAAI/bge-small-en-v1.5"
+_model = None
+
+
+def get_model():
+    """Load the embedding model once and reuse it."""
+    global _model
+    if _model is None:
+        _model = SentenceTransformer(MODEL_NAME)
+    return _model
+
+
+def embed(text: str) -> list:
+    return get_model().encode(text).tolist()
+
+
+def build_index():
+    """Embed every table description and store it. Run once, or after edits."""
+    conn = psycopg2.connect(os.environ["ADMIN_DATABASE_URL"])
+    cur = conn.cursor()
+
+    for table_name, description in TABLE_DESCRIPTIONS.items():
+        vector = embed(description)
+        cur.execute(
+            """
+            INSERT INTO table_docs (table_name, description, embedding)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (table_name)
+            DO UPDATE SET description = EXCLUDED.description,
+                          embedding   = EXCLUDED.embedding;
+            """,
+            (table_name, description, vector),
+        )
+        print("indexed:", table_name)
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+def retrieve_tables(question: str, k: int = 4) -> list:
+    """Return the k table names whose descriptions best match the question."""
+    vector = embed(question)
+
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT table_name, 1 - (embedding <=> %s::vector) AS similarity
+        FROM table_docs
+        ORDER BY embedding <=> %s::vector
+        LIMIT %s;
+        """,
+        (vector, vector, k),
+    )
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    return [(name, round(score, 3)) for name, score in rows]
