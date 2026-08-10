@@ -22,3 +22,11 @@ Status: in development
 - `validate_sql` splits on `;` naively, so a semicolon inside a string
   literal would be rejected. This is a false negative, never a false
   positive — the read-only role is the actual security guarantee.
+
+## Smoke test (Phase 2, 10 questions)
+
+10/10 on practice-set questions (easy/medium only). Observations:
+- Prompt's date-range rule was ignored; model used EXTRACT(YEAR...) instead.
+  Correct result, but non-sargable.
+- Model omits ORDER BY when the question doesn't imply one — motivates the
+  `order_matters` flag in the Phase 4 comparison function.
