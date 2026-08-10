@@ -30,3 +30,5 @@ Status: in development
   Correct result, but non-sargable.
 - Model omits ORDER BY when the question doesn't imply one — motivates the
   `order_matters` flag in the Phase 4 comparison function.
+- pgvector's Homebrew bottle only ships extensions for PG17/PG18, so it was
+  built from source (v0.8.0) against postgresql@16's pg_config.
