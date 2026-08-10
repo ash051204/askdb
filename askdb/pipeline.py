@@ -1,5 +1,7 @@
 import re
 
+from tabulate import tabulate
+
 from askdb.schema import get_schema
 
 PROMPT_TEMPLATE = """You are a PostgreSQL expert. Write a single SQL query that answers the user's question.
@@ -33,6 +35,13 @@ def extract_sql(text: str) -> str:
     if fenced:
         return fenced.group(1).strip()
     return text.strip()
+
+
+def format_results(columns, rows) -> str:
+    """Render query results as a text table."""
+    if not rows:
+        return "No rows returned."
+    return tabulate(rows, headers=columns)
 
 
 class UnsafeSQLError(Exception):
