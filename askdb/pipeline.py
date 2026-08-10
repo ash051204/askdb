@@ -33,3 +33,29 @@ def extract_sql(text: str) -> str:
     if fenced:
         return fenced.group(1).strip()
     return text.strip()
+
+
+class UnsafeSQLError(Exception):
+    """Raised when generated SQL fails validation."""
+
+
+def validate_sql(sql: str) -> str:
+    """Reject anything that isn't a single read-only statement.
+
+    The read-only DB role is the real guarantee; this exists to fail fast
+    with a clear message rather than after a database round-trip.
+    """
+    statements = [s.strip() for s in sql.split(";") if s.strip()]
+
+    if len(statements) == 0:
+        raise UnsafeSQLError("No SQL statement found.")
+    if len(statements) > 1:
+        raise UnsafeSQLError(f"Expected one statement, got {len(statements)}.")
+
+    statement = statements[0]
+    first_word = statement.split()[0].upper()
+
+    if first_word not in ("SELECT", "WITH"):
+        raise UnsafeSQLError(f"Only SELECT queries are allowed, got {first_word}.")
+
+    return statement
