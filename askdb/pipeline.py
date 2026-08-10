@@ -1,3 +1,5 @@
+import re
+
 from askdb.schema import get_schema
 
 PROMPT_TEMPLATE = """You are a PostgreSQL expert. Write a single SQL query that answers the user's question.
@@ -19,3 +21,15 @@ SQL:"""
 
 def build_prompt(question: str) -> str:
     return PROMPT_TEMPLATE.format(schema=get_schema(), question=question)
+
+
+def extract_sql(text: str) -> str:
+    """Pull the SQL statement out of an LLM response.
+
+    The model still wraps output in a markdown fence despite being told not
+    to, so strip it. If there's no fence, assume the whole reply is SQL.
+    """
+    fenced = re.search(r"```(?:sql)?\s*(.*?)```", text, re.DOTALL | re.IGNORECASE)
+    if fenced:
+        return fenced.group(1).strip()
+    return text.strip()
