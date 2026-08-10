@@ -16,3 +16,6 @@ Status: in development
 - Invoice dates span 2021-01-01 to 2025-12-22 (not the classic 2009-2013
   Chinook range). Eval questions must use years inside this window.
 - All 3503 tracks have a genre_id, so track-genre joins drop no rows.
+- Foreign keys are read from `pg_catalog`, not `information_schema`. The
+  latter filters by privilege and returns nothing for the read-only app
+  role, which silently produced a schema with no relationships.
