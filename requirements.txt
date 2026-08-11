@@ -3,3 +3,5 @@ python-dotenv
 requests
 tabulate
 sentence-transformers
+streamlit
+pandas
