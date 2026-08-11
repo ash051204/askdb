@@ -14,6 +14,8 @@ Rules:
 - Use only tables and columns that appear in the schema above.
 - Write a SELECT query only. Never modify the database.
 - If the question implies a top-N ("top 5", "most", "best"), use ORDER BY and LIMIT.
+- Return only the columns the question asks for. Do not add ID columns or
+  extra context columns that were not requested.
 - Date columns are timestamps. For a date range use `col >= 'start' AND col < 'next_start'`, not BETWEEN.
 
 Question: {question}
