@@ -33,7 +33,7 @@ id,question,difficulty,order_matters,gold_sql
 32,Which artist generated the most revenue?,hard,true,
 33,Which employee's customers generated the most revenue?,hard,true,
 34,List each employee with the name of the employee they report to.,hard,false,
-35,Which tracks appear on more than one playlist?,hard,false,
+35,Which tracks appear on more than 3 different playlists?,hard,false,
 36,Which customers spent more than the average customer?,hard,false,
 37,What was the total revenue in 2021?,hard,false,
 38,Which genre generated the most revenue?,hard,true,
