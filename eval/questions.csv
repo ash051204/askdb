@@ -14,21 +14,21 @@ id,question,difficulty,order_matters,gold_sql
 13,What is the total of all invoices combined?,easy,false,SELECT sum(total) FROM invoice;
 14,Which customers have no phone number on record?,easy,false,"SELECT first_name, last_name FROM customer WHERE phone IS NULL;"
 15,How many distinct billing countries appear in the invoices?,easy,false,SELECT count(DISTINCT billing_country) FROM invoice;
-16,List every album with its artist's name.,medium,false,
-17,List every track with its genre name.,medium,false,
-18,Which employee is the support rep for each customer?,medium,false,
-19,Show every invoice with the customer's first and last name.,medium,false,
-20,How many tracks does each genre have?,medium,false,
-21,Which 5 artists have the most albums?,medium,true,
-22,"List track name, album title, and artist name together.",medium,false,
-23,Which tracks did customer 1 buy?,medium,false,
-24,How many invoices did each customer make?,medium,false,
-25,What is the total revenue per billing country?,medium,false,
-26,List Rock tracks longer than 5 minutes.,medium,false,
-27,Which albums have more than 20 tracks?,medium,false,
-28,How many tracks are on each playlist?,medium,false,
-29,What is the average invoice total per billing country?,medium,false,
-30,Which media type has the most tracks?,medium,true,
+16,List every album with its artist's name.,medium,false,"SELECT album.title, artist.name FROM album JOIN artist ON album.artist_id = artist.artist_id;"
+17,List every track with its genre name.,medium,false,"SELECT track.name, genre.name FROM track JOIN genre ON track.genre_id = genre.genre_id;"
+18,Which employee is the support rep for each customer?,medium,false,"SELECT customer.first_name, customer.last_name, employee.first_name, employee.last_name FROM customer JOIN employee ON customer.support_rep_id = employee.employee_id;"
+19,Show every invoice with the customer's first and last name.,medium,false,"SELECT invoice.invoice_id, invoice.total, customer.first_name, customer.last_name FROM invoice JOIN customer ON invoice.customer_id = customer.customer_id;"
+20,How many tracks does each genre have?,medium,false,"SELECT genre.name, count(*) AS track_count FROM track JOIN genre ON track.genre_id = genre.genre_id GROUP BY genre.name;"
+21,Which 5 artists have the most albums?,medium,true,"SELECT artist.name, count(*) AS album_count FROM album JOIN artist ON album.artist_id = artist.artist_id GROUP BY artist.name ORDER BY album_count DESC LIMIT 5;"
+22,"List track name, album title, and artist name together.",medium,false,"SELECT track.name, album.title, artist.name FROM track JOIN album ON track.album_id = album.album_id JOIN artist ON album.artist_id = artist.artist_id;"
+23,Which tracks did customer 1 buy?,medium,false,SELECT track.name FROM invoice JOIN invoice_line ON invoice.invoice_id = invoice_line.invoice_id JOIN track ON invoice_line.track_id = track.track_id WHERE invoice.customer_id = 1;
+24,How many invoices did each customer make?,medium,false,"SELECT customer.first_name, customer.last_name, count(*) AS invoice_count FROM invoice JOIN customer ON invoice.customer_id = customer.customer_id GROUP BY customer.customer_id, customer.first_name, customer.last_name;"
+25,What is the total revenue per billing country?,medium,false,"SELECT billing_country, sum(total) AS revenue FROM invoice GROUP BY billing_country;"
+26,List Rock tracks longer than 5 minutes.,medium,false,SELECT track.name FROM track JOIN genre ON track.genre_id = genre.genre_id WHERE genre.name = 'Rock' AND track.milliseconds > 300000;
+27,Which albums have more than 20 tracks?,medium,false,"SELECT album.title, count(*) AS track_count FROM track JOIN album ON track.album_id = album.album_id GROUP BY album.album_id, album.title HAVING count(*) > 20;"
+28,How many tracks are on each playlist?,medium,false,"SELECT playlist.name, count(*) AS track_count FROM playlist_track JOIN playlist ON playlist_track.playlist_id = playlist.playlist_id GROUP BY playlist.playlist_id, playlist.name;"
+29,What is the average invoice total per billing country?,medium,false,"SELECT billing_country, avg(total) AS avg_invoice FROM invoice GROUP BY billing_country;"
+30,Which media type has the most tracks?,medium,true,"SELECT media_type.name, count(*) AS track_count FROM track JOIN media_type ON track.media_type_id = media_type.media_type_id GROUP BY media_type.name ORDER BY track_count DESC LIMIT 1;"
 31,Which 5 artists sold the most tracks?,hard,true,
 32,Which artist generated the most revenue?,hard,true,
 33,Which employee's customers generated the most revenue?,hard,true,
