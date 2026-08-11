@@ -37,7 +37,8 @@ ORDER BY src.relname, src_col.attname;
 """
 
 
-def get_schema() -> str:
+def get_schema(tables: list = None) -> str:
+    """Return CREATE TABLE text for the whole schema, or only `tables` if given."""
     conn = psycopg2.connect(os.environ["DATABASE_URL"])
     cur = conn.cursor()
 
@@ -51,9 +52,9 @@ def get_schema() -> str:
     conn.close()
 
     # Group columns by table
-    tables = defaultdict(list)
+    table_columns = defaultdict(list)
     for table_name, column_name, data_type in column_rows:
-        tables[table_name].append((column_name, data_type))
+        table_columns[table_name].append((column_name, data_type))
 
     # Group foreign keys by table
     foreign_keys = defaultdict(list)
@@ -62,7 +63,9 @@ def get_schema() -> str:
 
     # Build the text
     blocks = []
-    for table_name, columns in tables.items():
+    for table_name, columns in table_columns.items():
+        if tables is not None and table_name not in tables:
+            continue
         lines = [f"CREATE TABLE {table_name} ("]
         for column_name, data_type in columns:
             lines.append(f"  {column_name} {data_type},")

@@ -21,8 +21,15 @@ Question: {question}
 SQL:"""
 
 
-def build_prompt(question: str) -> str:
-    return PROMPT_TEMPLATE.format(schema=get_schema(), question=question)
+def build_prompt(question: str, use_retrieval: bool = False, k: int = 6) -> str:
+    """Build the prompt. With use_retrieval, include only the top-k tables."""
+    if use_retrieval:
+        from askdb.retrieval import retrieve_tables
+        tables = [name for name, _ in retrieve_tables(question, k=k)]
+        schema = get_schema(tables)
+    else:
+        schema = get_schema()
+    return PROMPT_TEMPLATE.format(schema=schema, question=question)
 
 
 def extract_sql(text: str) -> str:
@@ -88,7 +95,7 @@ Write a corrected SQL query. Return ONLY the SQL, no explanation.
 SQL:"""
 
 
-def answer(question: str, log=None):
+def answer(question: str, use_retrieval: bool = False, log=None):
     """Question -> SQL -> result, with one retry on failure.
 
     Returns (sql, columns, rows, error). Error is None on success.
@@ -98,7 +105,7 @@ def answer(question: str, log=None):
 
     attempts = []
 
-    sql = extract_sql(generate(build_prompt(question)))
+    sql = extract_sql(generate(build_prompt(question, use_retrieval=use_retrieval)))
     try:
         sql = validate_sql(sql)
     except UnsafeSQLError as e:
