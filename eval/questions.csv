@@ -1,19 +1,19 @@
 id,question,difficulty,order_matters,gold_sql
-1,How many tracks are in the database?,easy,false,
-2,Which customers are in Canada?,easy,false,
-3,What are the 10 most expensive tracks?,easy,true,
-4,List all genre names.,easy,false,
-5,Which tracks are longer than 5 minutes?,easy,false,
-6,How many customers are there in total?,easy,false,
-7,What is the average track price?,easy,false,
-8,Which customers have a company listed?,easy,false,
-9,List the 5 shortest tracks.,easy,true,
-10,How many albums are there?,easy,false,
-11,Which invoices totalled more than 10?,easy,false,
-12,List all media types.,easy,false,
-13,What is the total of all invoices combined?,easy,false,
-14,Which customers have no phone number on record?,easy,false,
-15,How many distinct billing countries appear in the invoices?,easy,false,
+1,How many tracks are in the database?,easy,false,SELECT count(*) FROM track;
+2,Which customers are in Canada?,easy,false,"SELECT first_name, last_name FROM customer WHERE country = 'Canada';"
+3,What are the 10 most expensive tracks?,easy,false,"SELECT name, unit_price FROM track ORDER BY unit_price DESC LIMIT 10;"
+4,List all genre names.,easy,false,SELECT name FROM genre;
+5,Which tracks are longer than 5 minutes?,easy,false,SELECT name FROM track WHERE milliseconds > 300000;
+6,How many customers are there in total?,easy,false,SELECT count(*) FROM customer;
+7,What is the average track price?,easy,false,SELECT avg(unit_price) FROM track;
+8,Which customers have a company listed?,easy,false,"SELECT first_name, last_name, company FROM customer WHERE company IS NOT NULL;"
+9,List the 5 shortest tracks.,easy,true,"SELECT name, milliseconds FROM track ORDER BY milliseconds ASC LIMIT 5;"
+10,How many albums are there?,easy,false,SELECT count(*) FROM album;
+11,Which invoices totalled more than 10?,easy,false,"SELECT invoice_id, total FROM invoice WHERE total > 10;"
+12,List all media types.,easy,false,SELECT name FROM media_type;
+13,What is the total of all invoices combined?,easy,false,SELECT sum(total) FROM invoice;
+14,Which customers have no phone number on record?,easy,false,"SELECT first_name, last_name FROM customer WHERE phone IS NULL;"
+15,How many distinct billing countries appear in the invoices?,easy,false,SELECT count(DISTINCT billing_country) FROM invoice;
 16,List every album with its artist's name.,medium,false,
 17,List every track with its genre name.,medium,false,
 18,Which employee is the support rep for each customer?,medium,false,
