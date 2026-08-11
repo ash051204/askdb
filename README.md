@@ -50,3 +50,25 @@ by top-k semantic retrieval unless k approaches full schema size.
 Sharpening the `playlist` description moved it from rank 1 to rank 6 on the
 artist question — wording measurably changes retrieval, but does not fix the
 structural limitation.
+
+## RAG vs. full-schema comparison (Phase 3)
+
+12 questions, qwen2.5-coder:7b, temperature 0, retrieval at k=6 of 11 tables.
+
+| Mode | Executed successfully | Avg prompt |
+|---|---|---|
+| Full schema | 12/12 | 3,231 chars |
+| Retrieval (k=6) | 11/12 | 1,933 chars |
+
+Retrieval cut prompt size 40% at the cost of one failure. The failing question
+("which artists sold the most tracks") needs a 4-table join chain
+artist -> album -> track -> invoice_line; `artist` ranks 7th of 11 in retrieval,
+so it was absent from the prompt and the model produced SQL referencing a table
+it could not see.
+
+Conclusion: on an 11-table schema that fits comfortably in context, retrieval
+trades correctness for tokens with no benefit. Semantic similarity ranks tables
+by topical match, but SQL generation requires join reachability — a table can be
+essential to a query while scoring poorly against the question text. Retrieval
+becomes worthwhile only when the full schema exceeds the context budget, and
+even then needs join-graph expansion rather than top-k alone.
