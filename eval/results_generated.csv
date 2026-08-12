@@ -1,0 +1,158 @@
+id,question,difficulty,order_matters,gold_sql,correct,reason,seconds,pred_sql
+g1,What are all the customers from Germany?,easy,false,SELECT * FROM customer WHERE country = 'Germany';,False,column count 11 != 13,12.0,"SELECT first_name, last_name, company, address, city, state, country, postal_code, phone, fax, email
+FROM customer
+WHERE country = 'Germany'"
+g2,What are all the customers from Brazil?,easy,false,SELECT * FROM customer WHERE country = 'Brazil';,False,column count 11 != 13,4.1,"SELECT first_name, last_name, company, address, city, state, country, postal_code, phone, fax, email
+FROM customer
+WHERE country = 'Brazil'"
+g3,Which customers live in the city of London?,easy,false,SELECT * FROM customer WHERE city = 'London';,False,column count 3 != 13,2.6,"SELECT first_name, last_name, email
+FROM customer
+WHERE city = 'London'"
+g4,What are all the invoices for purchases made in France?,easy,false,SELECT * FROM invoice WHERE billing_country = 'France';,True,,2.0,"SELECT *
+FROM invoice
+WHERE billing_country = 'France'"
+g5,What are all the invoices for customers who have billing addresses in Berlin?,easy,false,SELECT * FROM invoice WHERE billing_city = 'Berlin';,True,,2.0,"SELECT *
+FROM invoice
+WHERE billing_city = 'Berlin'"
+g6,How many tracks are there in the music store?,easy,false,SELECT count(*) FROM track;,True,,1.5,SELECT COUNT(*) FROM track
+g7,How many albums are there in the music store?,easy,false,SELECT count(*) FROM album;,True,,1.5,SELECT COUNT(*) FROM album
+g8,How many artists are there in the music store?,easy,false,SELECT count(*) FROM artist;,True,,1.5,SELECT COUNT(*) FROM artist
+g9,How many total sales have been made?,easy,false,SELECT count(*) FROM invoice;,False,values differ,1.8,SELECT SUM(total) AS total_sales FROM invoice
+g10,How many playlists are there in the music store?,easy,false,SELECT count(*) FROM playlist;,True,,1.5,SELECT COUNT(*) FROM playlist
+g11,How many different music genres are available in the store?,easy,false,SELECT count(*) FROM genre;,True,,1.9,SELECT COUNT(DISTINCT genre_id) FROM genre
+g12,What are the names and durations of tracks that last longer than 400 seconds?,easy,false,"SELECT name, milliseconds FROM track WHERE milliseconds > 400000;",False,values differ,3.4,"SELECT name, milliseconds / 1000 AS duration_seconds
+FROM track
+WHERE milliseconds > 400000"
+g13,What are the names and durations of all tracks that are shorter than 60 seconds?,easy,false,"SELECT name, milliseconds FROM track WHERE milliseconds < 60000;",False,values differ,3.4,"SELECT name, milliseconds / 1000 AS duration_seconds
+FROM track
+WHERE milliseconds < 60000"
+g14,What are the names and sizes of tracks that are larger than 10 megabytes?,easy,false,"SELECT name, bytes FROM track WHERE bytes > 10000000;",False,row count 823 != 936,3.3,"SELECT name, bytes 
+FROM track 
+WHERE bytes > 10 * 1024 * 1024"
+g15,What are the names and prices of tracks that cost more than $1.00?,easy,false,"SELECT name, unit_price FROM track WHERE unit_price > 1.0;",True,,2.6,"SELECT name, unit_price 
+FROM track 
+WHERE unit_price > 1.00"
+g16,What are the names of all tracks along with their corresponding genres?,medium,false,"SELECT track.name, genre.name FROM track JOIN genre ON track.genre_id = genre.genre_id;",True,,2.9,"SELECT track.name, genre.name 
+FROM track 
+JOIN genre ON track.genre_id = genre.genre_id"
+g17,What is the name of each track and its corresponding media type?,medium,false,"SELECT track.name, media_type.name FROM track JOIN media_type ON track.media_type_id = media_type.media_type_id;",True,,3.3,"SELECT track.name, media_type.name 
+FROM track 
+JOIN media_type ON track.media_type_id = media_type.media_type_id"
+g18,What are all the album titles and their corresponding artist names?,medium,false,"SELECT album.title, artist.name FROM album JOIN artist ON album.artist_id = artist.artist_id;",True,,2.8,"SELECT album.title, artist.name 
+FROM album 
+JOIN artist ON album.artist_id = artist.artist_id"
+g19,List every invoice amount along with the customer's last name.,medium,false,"SELECT invoice.total, customer.last_name FROM invoice JOIN customer ON invoice.customer_id = customer.customer_id;",True,,3.1,"SELECT i.total, c.last_name 
+FROM invoice i 
+JOIN customer c ON i.customer_id = c.customer_id"
+g20,Which 5 genres have the most tracks in the catalogue?,medium,true,"SELECT genre.name, count(*) AS n FROM genre JOIN track ON track.genre_id = genre.genre_id GROUP BY genre.name ORDER BY n DESC LIMIT 5;",True,,4.9,"SELECT g.name, COUNT(t.track_id) AS track_count
+FROM genre g
+JOIN track t ON g.genre_id = t.genre_id
+GROUP BY g.name
+ORDER BY track_count DESC
+LIMIT 5"
+g21,Which media types have the most tracks in the catalogue?,medium,true,"SELECT media_type.name, count(*) AS n FROM media_type JOIN track ON track.media_type_id = media_type.media_type_id GROUP BY media_type.name ORDER BY n DESC LIMIT 5;",True,,4.9,"SELECT mt.name, COUNT(t.track_id) AS track_count
+FROM media_type mt
+JOIN track t ON mt.media_type_id = t.media_type_id
+GROUP BY mt.name
+ORDER BY track_count DESC"
+g22,What are the top 5 artists with the most albums?,medium,true,"SELECT artist.name, count(*) AS n FROM artist JOIN album ON album.artist_id = artist.artist_id GROUP BY artist.name ORDER BY n DESC LIMIT 5;",True,,4.9,"SELECT artist.name, COUNT(album.album_id) AS album_count
+FROM artist
+JOIN album ON artist.artist_id = album.artist_id
+GROUP BY artist.name
+ORDER BY album_count DESC
+LIMIT 5"
+g23,What is the total invoiced amount per billing country?,medium,false,"SELECT billing_country, sum(total) AS v FROM invoice GROUP BY billing_country;",True,,3.1,"SELECT billing_country, SUM(total) AS total_invoiced_amount
+FROM invoice
+GROUP BY billing_country"
+g24,What is the average invoice amount per billing country?,medium,false,"SELECT billing_country, avg(total) AS v FROM invoice GROUP BY billing_country;",True,,2.9,"SELECT billing_country, AVG(total) AS average_invoice_amount
+FROM invoice
+GROUP BY billing_country"
+g25,How many invoices were generated in each country?,medium,false,"SELECT billing_country, count(*) AS v FROM invoice GROUP BY billing_country;",True,,2.6,"SELECT billing_country, COUNT(*) AS invoice_count
+FROM invoice
+GROUP BY billing_country"
+g26,What is the total invoiced amount per billing city?,medium,false,"SELECT billing_city, sum(total) AS v FROM invoice GROUP BY billing_city;",True,,3.0,"SELECT billing_city, SUM(total) AS total_invoiced_amount
+FROM invoice
+GROUP BY billing_city"
+g27,What is the average invoice amount per billing city?,medium,false,"SELECT billing_city, avg(total) AS v FROM invoice GROUP BY billing_city;",True,,2.8,"SELECT billing_city, AVG(total) AS average_invoice_amount
+FROM invoice
+GROUP BY billing_city"
+g28,How many invoices were generated for each billing city?,medium,false,"SELECT billing_city, count(*) AS v FROM invoice GROUP BY billing_city;",True,,2.6,"SELECT billing_city, COUNT(*) AS invoice_count
+FROM invoice
+GROUP BY billing_city"
+g29,What are the top 5 music genres by units sold?,hard,true,"SELECT genre.name, sum(invoice_line.quantity) AS units_sold FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN genre ON track.genre_id = genre.genre_id GROUP BY genre.name ORDER BY units_sold DESC LIMIT 5;",True,,6.5,"SELECT g.name AS genre_name, SUM(il.quantity) AS total_units_sold
+FROM genre g
+JOIN track t ON g.genre_id = t.genre_id
+JOIN invoice_line il ON t.track_id = il.track_id
+GROUP BY g.name
+ORDER BY total_units_sold DESC
+LIMIT 5"
+g30,What are the top 5 music genres by revenue?,hard,true,"SELECT genre.name, sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN genre ON track.genre_id = genre.genre_id GROUP BY genre.name ORDER BY revenue DESC LIMIT 5;",True,,6.9,"SELECT g.name AS genre_name, SUM(il.unit_price * il.quantity) AS total_revenue
+FROM genre g
+JOIN track t ON g.genre_id = t.genre_id
+JOIN invoice_line il ON t.track_id = il.track_id
+GROUP BY g.name
+ORDER BY total_revenue DESC
+LIMIT 5"
+g31,What are the top 5 artists with the highest number of units sold?,hard,true,"SELECT artist.name, sum(invoice_line.quantity) AS units_sold FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN album ON track.album_id = album.album_id JOIN artist ON album.artist_id = artist.artist_id GROUP BY artist.name ORDER BY units_sold DESC LIMIT 5;",True,,7.3,"SELECT artist.name, SUM(invoice_line.quantity) AS total_units_sold
+FROM artist
+JOIN album ON artist.artist_id = album.artist_id
+JOIN track ON album.album_id = track.album_id
+JOIN invoice_line ON track.track_id = invoice_line.track_id
+GROUP BY artist.name
+ORDER BY total_units_sold DESC
+LIMIT 5"
+g32,What are the top 5 artists by revenue generated from their music sold?,hard,true,"SELECT artist.name, sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN album ON track.album_id = album.album_id JOIN artist ON album.artist_id = artist.artist_id GROUP BY artist.name ORDER BY revenue DESC LIMIT 5;",False,row order or values differ,8.5,"SELECT artist.name, SUM(invoice.total) AS total_revenue
+FROM artist
+JOIN album ON artist.artist_id = album.artist_id
+JOIN track ON album.album_id = track.album_id
+JOIN invoice_line ON track.track_id = invoice_line.track_id
+JOIN invoice ON invoice_line.invoice_id = invoice.invoice_id
+GROUP BY artist.name
+ORDER BY total_revenue DESC
+LIMIT 5"
+g33,What are the top 5 media types by units sold?,hard,true,"SELECT media_type.name, sum(invoice_line.quantity) AS units_sold FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN media_type ON track.media_type_id = media_type.media_type_id GROUP BY media_type.name ORDER BY units_sold DESC LIMIT 5;",True,,6.7,"SELECT mt.name, SUM(il.quantity) AS total_units_sold
+FROM invoice_line il
+JOIN track t ON il.track_id = t.track_id
+JOIN media_type mt ON t.media_type_id = mt.media_type_id
+GROUP BY mt.name
+ORDER BY total_units_sold DESC
+LIMIT 5"
+g34,What are the top 5 media types by revenue generated from sold tracks?,hard,true,"SELECT media_type.name, sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN media_type ON track.media_type_id = media_type.media_type_id GROUP BY media_type.name ORDER BY revenue DESC LIMIT 5;",True,,7.3,"SELECT mt.name AS media_type, SUM(il.unit_price * il.quantity) AS total_revenue
+FROM invoice_line il
+JOIN track t ON il.track_id = t.track_id
+JOIN media_type mt ON t.media_type_id = mt.media_type_id
+GROUP BY mt.name
+ORDER BY total_revenue DESC
+LIMIT 5"
+g35,What are the top 5 albums with the highest number of units sold?,hard,true,"SELECT album.title, sum(invoice_line.quantity) AS units_sold FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN album ON track.album_id = album.album_id GROUP BY album.title ORDER BY units_sold DESC LIMIT 5;",True,,6.4,"SELECT album.title, SUM(invoice_line.quantity) AS total_units_sold
+FROM album
+JOIN track ON album.album_id = track.album_id
+JOIN invoice_line ON track.track_id = invoice_line.track_id
+GROUP BY album.title
+ORDER BY total_units_sold DESC
+LIMIT 5"
+g36,What are the top 5 albums with the highest revenue generated from sold tracks?,hard,true,"SELECT album.title, sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN album ON track.album_id = album.album_id GROUP BY album.title ORDER BY revenue DESC LIMIT 5;",True,,8.1,"SELECT album.title, SUM(invoice_line.unit_price * invoice_line.quantity) AS total_revenue
+FROM album
+JOIN track ON album.album_id = track.album_id
+JOIN invoice_line ON track.track_id = invoice_line.track_id
+JOIN invoice ON invoice_line.invoice_id = invoice.invoice_id
+GROUP BY album.title
+ORDER BY total_revenue DESC
+LIMIT 5"
+g37,What is the total revenue from all songs sold in the USA?,hard,false,SELECT sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN invoice ON invoice_line.invoice_id = invoice.invoice_id WHERE invoice.billing_country = 'USA';,True,,2.8,"SELECT SUM(total) AS total_revenue
+FROM invoice
+WHERE billing_country = 'USA'"
+g38,What is the total revenue from music sales in Canada?,hard,false,SELECT sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN invoice ON invoice_line.invoice_id = invoice.invoice_id WHERE invoice.billing_country = 'Canada';,True,,2.7,"SELECT SUM(total) AS total_revenue
+FROM invoice
+WHERE billing_country = 'Canada'"
+g39,What is the total revenue from music sales in Brazil?,hard,false,SELECT sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN invoice ON invoice_line.invoice_id = invoice.invoice_id WHERE invoice.billing_country = 'Brazil';,True,,2.7,"SELECT SUM(total) AS total_revenue
+FROM invoice
+WHERE billing_country = 'Brazil'"
+g40,Which customers have purchased tracks from more than 7 different music genres?,hard,false,"SELECT customer.last_name, count(DISTINCT track.genre_id) AS n FROM customer JOIN invoice ON invoice.customer_id = customer.customer_id JOIN invoice_line ON invoice_line.invoice_id = invoice.invoice_id JOIN track ON track.track_id = invoice_line.track_id GROUP BY customer.customer_id, customer.last_name HAVING count(DISTINCT track.genre_id) > 7;",False,values differ,9.6,"SELECT c.first_name, c.last_name
+FROM customer c
+JOIN invoice i ON c.customer_id = i.customer_id
+JOIN invoice_line il ON i.invoice_id = il.invoice_id
+JOIN track t ON il.track_id = t.track_id
+JOIN genre g ON t.genre_id = g.genre_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT g.genre_id) > 7"

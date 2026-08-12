@@ -1,0 +1,41 @@
+sql,difficulty,order_matters,row_count
+SELECT * FROM customer WHERE country = 'Germany';,easy,false,4
+SELECT * FROM customer WHERE country = 'Brazil';,easy,false,5
+SELECT * FROM customer WHERE city = 'London';,easy,false,2
+SELECT * FROM invoice WHERE billing_country = 'France';,easy,false,35
+SELECT * FROM invoice WHERE billing_city = 'Berlin';,easy,false,14
+SELECT count(*) FROM track;,easy,false,1
+SELECT count(*) FROM album;,easy,false,1
+SELECT count(*) FROM artist;,easy,false,1
+SELECT count(*) FROM invoice;,easy,false,1
+SELECT count(*) FROM playlist;,easy,false,1
+SELECT count(*) FROM genre;,easy,false,1
+"SELECT name, milliseconds FROM track WHERE milliseconds > 400000;",easy,false,475
+"SELECT name, milliseconds FROM track WHERE milliseconds < 60000;",easy,false,27
+"SELECT name, bytes FROM track WHERE bytes > 10000000;",easy,false,936
+"SELECT name, unit_price FROM track WHERE unit_price > 1.0;",easy,false,213
+"SELECT track.name, genre.name FROM track JOIN genre ON track.genre_id = genre.genre_id;",medium,false,3503
+"SELECT track.name, media_type.name FROM track JOIN media_type ON track.media_type_id = media_type.media_type_id;",medium,false,3503
+"SELECT album.title, artist.name FROM album JOIN artist ON album.artist_id = artist.artist_id;",medium,false,347
+"SELECT invoice.total, customer.last_name FROM invoice JOIN customer ON invoice.customer_id = customer.customer_id;",medium,false,412
+"SELECT genre.name, count(*) AS n FROM genre JOIN track ON track.genre_id = genre.genre_id GROUP BY genre.name ORDER BY n DESC LIMIT 5;",medium,true,5
+"SELECT media_type.name, count(*) AS n FROM media_type JOIN track ON track.media_type_id = media_type.media_type_id GROUP BY media_type.name ORDER BY n DESC LIMIT 5;",medium,true,5
+"SELECT artist.name, count(*) AS n FROM artist JOIN album ON album.artist_id = artist.artist_id GROUP BY artist.name ORDER BY n DESC LIMIT 5;",medium,true,5
+"SELECT billing_country, sum(total) AS v FROM invoice GROUP BY billing_country;",medium,false,24
+"SELECT billing_country, avg(total) AS v FROM invoice GROUP BY billing_country;",medium,false,24
+"SELECT billing_country, count(*) AS v FROM invoice GROUP BY billing_country;",medium,false,24
+"SELECT billing_city, sum(total) AS v FROM invoice GROUP BY billing_city;",medium,false,53
+"SELECT billing_city, avg(total) AS v FROM invoice GROUP BY billing_city;",medium,false,53
+"SELECT billing_city, count(*) AS v FROM invoice GROUP BY billing_city;",medium,false,53
+"SELECT genre.name, sum(invoice_line.quantity) AS units_sold FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN genre ON track.genre_id = genre.genre_id GROUP BY genre.name ORDER BY units_sold DESC LIMIT 5;",hard,true,5
+"SELECT genre.name, sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN genre ON track.genre_id = genre.genre_id GROUP BY genre.name ORDER BY revenue DESC LIMIT 5;",hard,true,5
+"SELECT artist.name, sum(invoice_line.quantity) AS units_sold FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN album ON track.album_id = album.album_id JOIN artist ON album.artist_id = artist.artist_id GROUP BY artist.name ORDER BY units_sold DESC LIMIT 5;",hard,true,5
+"SELECT artist.name, sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN album ON track.album_id = album.album_id JOIN artist ON album.artist_id = artist.artist_id GROUP BY artist.name ORDER BY revenue DESC LIMIT 5;",hard,true,5
+"SELECT media_type.name, sum(invoice_line.quantity) AS units_sold FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN media_type ON track.media_type_id = media_type.media_type_id GROUP BY media_type.name ORDER BY units_sold DESC LIMIT 5;",hard,true,5
+"SELECT media_type.name, sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN media_type ON track.media_type_id = media_type.media_type_id GROUP BY media_type.name ORDER BY revenue DESC LIMIT 5;",hard,true,5
+"SELECT album.title, sum(invoice_line.quantity) AS units_sold FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN album ON track.album_id = album.album_id GROUP BY album.title ORDER BY units_sold DESC LIMIT 5;",hard,true,5
+"SELECT album.title, sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN track ON invoice_line.track_id = track.track_id JOIN album ON track.album_id = album.album_id GROUP BY album.title ORDER BY revenue DESC LIMIT 5;",hard,true,5
+SELECT sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN invoice ON invoice_line.invoice_id = invoice.invoice_id WHERE invoice.billing_country = 'USA';,hard,false,1
+SELECT sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN invoice ON invoice_line.invoice_id = invoice.invoice_id WHERE invoice.billing_country = 'Canada';,hard,false,1
+SELECT sum(invoice_line.unit_price * invoice_line.quantity) AS revenue FROM invoice_line JOIN invoice ON invoice_line.invoice_id = invoice.invoice_id WHERE invoice.billing_country = 'Brazil';,hard,false,1
+"SELECT customer.last_name, count(DISTINCT track.genre_id) AS n FROM customer JOIN invoice ON invoice.customer_id = customer.customer_id JOIN invoice_line ON invoice_line.invoice_id = invoice.invoice_id JOIN track ON track.track_id = invoice_line.track_id GROUP BY customer.customer_id, customer.last_name HAVING count(DISTINCT track.genre_id) > 7;",hard,false,25

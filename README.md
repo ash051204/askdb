@@ -349,3 +349,36 @@ This is consistent with the error analysis: since 9 of 12 failures were
 column-selection mismatches rather than incorrect SQL, model capability can
 only address the 3 genuine failures. On this eval the accuracy ceiling is set
 by the strictness of the comparison rule, not by the model.
+
+### Held-out validation on a reverse-generated eval set
+
+To check whether the two prompt rules generalised or merely fit the original
+40 questions, a second 40-question set was generated in reverse: SQL was
+written by template first, verified to execute and return non-empty results,
+then an LLM was asked to describe each query in plain English. The SQL is
+correct by construction; only the questions are model-generated.
+
+| Set | Overall | Easy | Medium | Hard |
+|---|---|---|---|---|
+| Hand-written (40) | 70.0% | 15/15 | 9/15 | 4/10 |
+| Reverse-generated (40) | 77.5% | 8/15 | 13/13 | 10/12 |
+
+The prompt rules generalise — accuracy did not collapse on unseen questions.
+
+But the tier profile inverts, and the reason matters. Easy-tier failures were
+artifacts of the generator: `SELECT *` gold queries demand all 13 customer
+columns where the model reasonably returns two, and unit conversions
+("400 seconds" vs `milliseconds > 400000`) were lost in translation.
+
+More significantly, the hard tier scored 83% here against 40% on hand-written
+questions of equivalent SQL complexity. Reverse-generated questions are
+written by describing the query, so they encode the disambiguation the model
+would otherwise have to infer: "top 5 artists by revenue generated from their
+music sold" states the measure explicitly, where the hand-written "which
+artists sold the most tracks" does not — and the latter fails on both 7B and
+14B models.
+
+Automated gold-set generation is therefore useful for regression testing and
+for checking that prompt changes generalise, but it systematically overstates
+accuracy on questions whose difficulty comes from ambiguity rather than SQL
+complexity.
