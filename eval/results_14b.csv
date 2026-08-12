@@ -1,0 +1,168 @@
+id,difficulty,question,correct,reason,attempts,seconds,pred_sql,pred_error
+1,easy,How many tracks are in the database?,True,,1,9.6,SELECT COUNT(*) FROM track,
+2,easy,Which customers are in Canada?,True,,1,2.5,"SELECT first_name, last_name
+FROM customer
+WHERE country = 'Canada'",
+3,easy,What are the 10 most expensive tracks?,True,,1,2.8,"SELECT name, unit_price
+FROM track
+ORDER BY unit_price DESC
+LIMIT 10",
+4,easy,List all genre names.,True,,1,1.4,SELECT name FROM genre,
+5,easy,Which tracks are longer than 5 minutes?,True,,1,2.3,SELECT name FROM track WHERE milliseconds > 300000,
+6,easy,How many customers are there in total?,True,,1,1.5,SELECT COUNT(*) FROM customer,
+7,easy,What is the average track price?,True,,1,2.1,"SELECT AVG(unit_price) AS average_track_price
+FROM track",
+8,easy,Which customers have a company listed?,False,values differ,1,2.6,"SELECT first_name, last_name, email
+FROM customer
+WHERE company IS NOT NULL",
+9,easy,List the 5 shortest tracks.,True,,1,2.5,"SELECT name, milliseconds
+FROM track
+ORDER BY milliseconds ASC
+LIMIT 5",
+10,easy,How many albums are there?,True,,1,1.5,SELECT COUNT(*) FROM album,
+11,easy,Which invoices totalled more than 10?,True,,1,2.5,"SELECT invoice_id, total
+FROM invoice
+WHERE total > 10",
+12,easy,List all media types.,True,,1,1.5,SELECT name FROM media_type,
+13,easy,What is the total of all invoices combined?,True,,1,2.1,"SELECT SUM(total) AS total_invoices
+FROM invoice",
+14,easy,Which customers have no phone number on record?,True,,1,2.4,"SELECT first_name, last_name
+FROM customer
+WHERE phone IS NULL",
+15,easy,How many distinct billing countries appear in the invoices?,True,,1,2.2,"SELECT COUNT(DISTINCT billing_country) 
+FROM invoice",
+16,medium,List every album with its artist's name.,True,,1,3.0,"SELECT album.title, artist.name 
+FROM album 
+JOIN artist ON album.artist_id = artist.artist_id",
+17,medium,List every track with its genre name.,True,,1,3.4,"SELECT track.name, genre.name AS genre_name
+FROM track
+JOIN genre ON track.genre_id = genre.genre_id",
+18,medium,Which employee is the support rep for each customer?,True,,1,5.1,"SELECT c.first_name, c.last_name, e.first_name AS support_rep_first_name, e.last_name AS support_rep_last_name
+FROM customer c
+JOIN employee e ON c.support_rep_id = e.employee_id",
+19,medium,Show every invoice with the customer's first and last name.,False,column count 3 != 4,1,3.5,"SELECT i.invoice_id, c.first_name, c.last_name
+FROM invoice i
+JOIN customer c ON i.customer_id = c.customer_id",
+20,medium,How many tracks does each genre have?,True,,1,4.4,"SELECT g.name AS genre_name, COUNT(t.track_id) AS track_count
+FROM genre g
+LEFT JOIN track t ON g.genre_id = t.genre_id
+GROUP BY g.genre_id",
+21,medium,Which 5 artists have the most albums?,True,,1,5.0,"SELECT artist.name, COUNT(album.album_id) AS album_count
+FROM artist
+JOIN album ON artist.artist_id = album.artist_id
+GROUP BY artist.name
+ORDER BY album_count DESC
+LIMIT 5",
+22,medium,"List track name, album title, and artist name together.",True,,1,6.2,"SELECT 
+    t.name AS track_name,
+    a.title AS album_title,
+    ar.name AS artist_name
+FROM 
+    track t
+JOIN 
+    album a ON t.album_id = a.album_id
+JOIN 
+    artist ar ON a.artist_id = ar.artist_id",
+23,medium,Which tracks did customer 1 buy?,True,,1,4.5,"SELECT track.name
+FROM invoice_line
+JOIN track ON invoice_line.track_id = track.track_id
+JOIN invoice ON invoice_line.invoice_id = invoice.invoice_id
+WHERE invoice.customer_id = 1",
+24,medium,How many invoices did each customer make?,False,column count 2 != 3,1,2.5,"SELECT customer_id, COUNT(*) AS invoice_count
+FROM invoice
+GROUP BY customer_id",
+25,medium,What is the total revenue per billing country?,True,,1,2.8,"SELECT billing_country, SUM(total) AS total_revenue
+FROM invoice
+GROUP BY billing_country",
+26,medium,List Rock tracks longer than 5 minutes.,True,,1,4.4,"SELECT track.name
+FROM track
+JOIN genre ON track.genre_id = genre.genre_id
+WHERE genre.name = 'Rock'
+AND track.milliseconds > 300000",
+27,medium,Which albums have more than 20 tracks?,False,column count 1 != 2,1,4.4,"SELECT album.title
+FROM album
+JOIN track ON album.album_id = track.album_id
+GROUP BY album.album_id, album.title
+HAVING COUNT(track.track_id) > 20",
+28,medium,How many tracks are on each playlist?,False,values differ,1,2.8,"SELECT playlist_id, COUNT(track_id) AS track_count
+FROM playlist_track
+GROUP BY playlist_id",
+29,medium,What is the average invoice total per billing country?,True,,1,2.6,"SELECT billing_country, AVG(total) AS average_total
+FROM invoice
+GROUP BY billing_country",
+30,medium,Which media type has the most tracks?,False,column count 1 != 2,1,4.6,"SELECT mt.name 
+FROM media_type mt 
+JOIN track t ON mt.media_type_id = t.media_type_id 
+GROUP BY mt.name 
+ORDER BY COUNT(t.track_id) DESC 
+LIMIT 1",
+31,hard,Which 5 artists sold the most tracks?,False,row order or values differ,1,6.7,"SELECT artist.name, COUNT(*) AS total_tracks_sold
+FROM artist
+JOIN album ON artist.artist_id = album.artist_id
+JOIN track ON album.album_id = track.track_id
+JOIN invoice_line ON track.track_id = invoice_line.track_id
+GROUP BY artist.name
+ORDER BY total_tracks_sold DESC
+LIMIT 5",
+32,hard,Which artist generated the most revenue?,False,row order or values differ,1,8.1,"SELECT artist.name, SUM(invoice.total) AS total_revenue
+FROM artist
+JOIN album ON artist.artist_id = album.artist_id
+JOIN track ON album.album_id = track.album_id
+JOIN invoice_line ON track.track_id = invoice_line.track_id
+JOIN invoice ON invoice_line.invoice_id = invoice.invoice_id
+GROUP BY artist.name
+ORDER BY total_revenue DESC
+LIMIT 1",
+33,hard,Which employee's customers generated the most revenue?,True,,1,7.7,"SELECT e.first_name, e.last_name, SUM(i.total) AS total_revenue
+FROM employee e
+JOIN customer c ON e.employee_id = c.support_rep_id
+JOIN invoice i ON c.customer_id = i.customer_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY total_revenue DESC
+LIMIT 1",
+34,hard,List each employee with the name of the employee they report to.,False,column count 2 != 4,1,5.3,"SELECT e.first_name || ' ' || e.last_name AS employee_name,
+       m.first_name || ' ' || m.last_name AS reports_to
+FROM employee e
+LEFT JOIN employee m ON e.reports_to = m.employee_id",
+35,hard,Which tracks appear on more than 3 different playlists?,False,values differ,1,4.0,"SELECT track_id, COUNT(playlist_id) AS playlist_count
+FROM playlist_track
+GROUP BY track_id
+HAVING COUNT(playlist_id) > 3",
+36,hard,Which customers spent more than the average customer?,True,,1,8.6,"SELECT c.first_name, c.last_name, SUM(i.total) AS total_spent
+FROM customer c
+JOIN invoice i ON c.customer_id = i.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING SUM(i.total) > (SELECT AVG(total_spent) FROM (SELECT customer_id, SUM(total) AS total_spent FROM invoice GROUP BY customer_id) subquery)",
+37,hard,What was the total revenue in 2021?,True,,1,3.6,"SELECT SUM(total) AS total_revenue
+FROM invoice
+WHERE EXTRACT(YEAR FROM invoice_date) = 2021",
+38,hard,Which genre generated the most revenue?,True,,1,6.9,"SELECT g.name AS genre_name, SUM(il.unit_price * il.quantity) AS total_revenue
+FROM genre g
+JOIN track t ON g.genre_id = t.genre_id
+JOIN invoice_line il ON t.track_id = il.track_id
+GROUP BY g.name
+ORDER BY total_revenue DESC
+LIMIT 1",
+39,hard,Which customers bought tracks from more than 5 different genres?,False,column count 2 != 3,1,8.6,"SELECT c.first_name, c.last_name
+FROM customer c
+JOIN invoice i ON c.customer_id = i.customer_id
+JOIN invoice_line il ON i.invoice_id = il.invoice_id
+JOIN track t ON il.track_id = t.track_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT t.genre_id) > 5",
+40,hard,What is the most purchased genre in each country?,False,row count 237 != 24,1,9.7,"SELECT 
+    billing_country,
+    g.name AS genre_name,
+    COUNT(il.invoice_line_id) AS purchase_count
+FROM 
+    invoice i
+JOIN 
+    invoice_line il ON i.invoice_id = il.invoice_id
+JOIN 
+    track t ON il.track_id = t.track_id
+JOIN 
+    genre g ON t.genre_id = g.genre_id
+GROUP BY 
+    billing_country, g.name
+ORDER BY 
+    billing_country, purchase_count DESC",

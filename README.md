@@ -328,3 +328,24 @@ PostgreSQL 16 · pgvector · Ollama (`qwen2.5-coder:7b`) ·
 sentence-transformers (`BAAI/bge-small-en-v1.5`) · psycopg2 · Streamlit · Python 3.12
 
 All components open source and locally hosted.
+
+### Model size comparison
+
+Identical eval set, comparison rule, and prompt — only the model changed.
+
+| Model | Overall | Easy | Medium | Hard | Avg latency |
+|---|---|---|---|---|---|
+| qwen2.5-coder:7b | 28/40 (70.0%) | 15/15 | 9/15 | 4/10 | 2.7s |
+| qwen2.5-coder:14b | 28/40 (70.0%) | 14/15 | 10/15 | 4/10 | 4.2s |
+
+Doubling model size produced no net accuracy change at 1.6x the latency.
+The 14B model fixed Q36 (nested aggregate — a genuine reasoning gain the 7B
+could not make) and Q18, but regressed Q8 and Q32, both column-shape
+differences rather than logic errors.
+
+Q40 (per-group ranking, requiring a window function) failed on both models.
+
+This is consistent with the error analysis: since 9 of 12 failures were
+column-selection mismatches rather than incorrect SQL, model capability can
+only address the 3 genuine failures. On this eval the accuracy ceiling is set
+by the strictness of the comparison rule, not by the model.
