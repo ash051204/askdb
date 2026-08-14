@@ -1,5 +1,7 @@
 # AskDB — Natural Language to SQL
 
+**[Demo video](https://youtu.be/X0zH-giboOw)** · 8 minutes
+
 A text-to-SQL system over the Chinook music-store database (11 tables, PostgreSQL),
 built entirely on open-source, locally-hosted components. Questions in plain English
 are converted to SQL, validated, executed against a read-only database role, and
